@@ -29,7 +29,7 @@ public class ShadowstrikeKatana extends JavaPlugin implements Listener {
 
     private static final String SHADOWSTRIKE_TAG = "shadowstrike_katana";
     private final WeakHashMap<UUID, Long> cooldowns = new WeakHashMap<>();
-    private static final double MAX_TELEPORT_DISTANCE = 10.0; // Maximum range for teleportation
+    private static final double MAX_TELEPORT_DISTANCE = 10.0;
 
     @Override
     public void onEnable() {
@@ -58,30 +58,22 @@ public class ShadowstrikeKatana extends JavaPlugin implements Listener {
     }
 
     private void giveShadowstrikeKatana(Player player) {
-        ItemStack katana = new ItemStack(Material.IRON_SWORD); // Iron sword with diamond sword stats
+        ItemStack katana = new ItemStack(Material.IRON_SWORD);
         ItemMeta meta = katana.getItemMeta();
 
         if (meta != null) {
-            // Set custom damage and attack speed attributes
             meta.setDisplayName(applyGradient("ꜱʜᴀᴅᴏᴡꜱᴛʀɪᴋᴇ ᴋᴀᴛᴀɴᴀ", "#432E71", "#CAA9C6"));
             meta.getPersistentDataContainer().set(new NamespacedKey(this, SHADOWSTRIKE_TAG), PersistentDataType.BYTE, (byte) 1);
 
-            // Add lore and enchantments
             List<String> lore = new ArrayList<>();
-
-            // Enchantments at the top
             lore.add(applyGradient("« ᴇɴᴄʜᴀɴᴛᴍᴇɴᴛꜱ »", "#432E71", "#CAA9C6"));
-            lore.add(applyGradient("", "#432E71", "#CAA9C6"));  // Empty line for gap
+            lore.add(applyGradient("", "#432E71", "#CAA9C6"));
             lore.add(applyGradient("ꜱʜᴀʀᴘɴᴇꜱꜱ ᴠ", "#432E71", "#CAA9C6"));
             lore.add(applyGradient("ꜰɪʀᴇ ᴀꜱᴘᴇᴄᴛ ɪɪ", "#432E71", "#CAA9C6"));
             lore.add(applyGradient("ᴜɴʙʀᴇᴀᴋɪɴɢ ɪɪɪ", "#432E71", "#CAA9C6"));
             lore.add(applyGradient("ᴍᴇɴᴅɪɴɢ", "#432E71", "#CAA9C6"));
-            lore.add(applyGradient("ꜱʜᴀᴅᴏᴡ ꜱᴛʀɪᴋᴇ", "#432E71", "#CAA9C6")); // Custom enchantment for teleportation ability
-
-            // Gap between enchantments and lore
+            lore.add(applyGradient("ꜱʜᴀᴅᴏᴡ ꜱᴛʀɪᴋᴇ", "#432E71", "#CAA9C6"));
             lore.add(applyGradient("", "#432E71", "#CAA9C6"));
-
-            // Main lore
             lore.add(applyGradient("✧━━━━━━━━━━━━◈━━━━━━━━━━━━✧", "#432E71", "#CAA9C6"));
             lore.add(applyGradient("ꜰᴏʀɢᴇᴅ ɪɴ ᴛʜᴇ ꜱʜᴀᴅᴏᴡꜱ.", "#432E71", "#CAA9C6"));
             lore.add(applyGradient("ᴀ ʙʟᴀᴅᴇ ᴏꜰ ᴅᴀʀᴋ ᴡʜɪꜱᴘᴇʀꜱ.", "#432E71", "#CAA9C6"));
@@ -94,13 +86,12 @@ public class ShadowstrikeKatana extends JavaPlugin implements Listener {
 
             meta.setLore(lore);
 
-            // Add actual enchantments, but hide them with ItemFlags
-            meta.addEnchant(Enchantment.SHARPNESS, 5, true); // Sharpness V
-            meta.addEnchant(Enchantment.FIRE_ASPECT, 2, true); // Fire Aspect II
-            meta.addEnchant(Enchantment.UNBREAKING, 3, true); // Unbreaking III
-            meta.addEnchant(Enchantment.MENDING, 1, true); // Mending
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS); // Hide enchant glint
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES); // Hide sword stats
+            meta.addEnchant(Enchantment.SHARPNESS, 5, true);
+            meta.addEnchant(Enchantment.FIRE_ASPECT, 2, true);
+            meta.addEnchant(Enchantment.UNBREAKING, 3, true);
+            meta.addEnchant(Enchantment.MENDING, 1, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 
             katana.setItemMeta(meta);
             player.getInventory().addItem(katana);
@@ -116,7 +107,6 @@ public class ShadowstrikeKatana extends JavaPlugin implements Listener {
 
         ItemMeta meta = item.getItemMeta();
         if (meta != null && meta.getPersistentDataContainer().has(new NamespacedKey(this, SHADOWSTRIKE_TAG), PersistentDataType.BYTE)) {
-            // Check for right-click and cooldown
             if (event.getAction().toString().contains("RIGHT_CLICK") && isOffCooldown(player)) {
                 if (teleportBehindTarget(player)) {
                     setCooldown(player);
@@ -130,42 +120,36 @@ public class ShadowstrikeKatana extends JavaPlugin implements Listener {
     }
 
     private void setCooldown(Player player) {
-        // Set cooldown for 10 seconds
-        player.setCooldown(Material.IRON_SWORD, 200); // 10 seconds in ticks (200 ticks)
+        player.setCooldown(Material.IRON_SWORD, 200);
         cooldowns.put(player.getUniqueId(), System.currentTimeMillis());
     }
 
     private boolean teleportBehindTarget(Player player) {
-        // Perform a ray trace to find the player the user is looking at
         RayTraceResult result = player.getWorld().rayTraceEntities(
                 player.getEyeLocation(), player.getEyeLocation().getDirection(), MAX_TELEPORT_DISTANCE, 0.1, entity -> entity instanceof Player && entity != player);
 
         if (result != null && result.getHitEntity() instanceof Player) {
             Player target = (Player) result.getHitEntity();
 
-            // Teleport behind the target player
-            Vector direction = target.getLocation().getDirection().multiply(-1); // Get the opposite direction
-            direction.setY(0); // Keep the height the same
-            player.teleport(target.getLocation().add(direction.normalize().multiply(2))); // Teleport 2 blocks behind
-            player.setRotation(target.getLocation().getYaw(), player.getLocation().getPitch()); // Rotate player to face the target's back
-            return true; // Successful teleport
+            Vector direction = target.getLocation().getDirection().multiply(-1);
+            direction.setY(0);
+            player.teleport(target.getLocation().add(direction.normalize().multiply(2)));
+            player.setRotation(target.getLocation().getYaw(), player.getLocation().getPitch());
+            return true;
         }
 
-        return false; // No player found or player not looking at target
+        return false;
     }
 
-    // Function to apply a smooth gradient from startColor to endColor across the text
     private String applyGradient(String text, String startColor, String endColor) {
         StringBuilder gradientText = new StringBuilder();
         int length = text.length();
 
-        // Convert start and end colors from hex to RGB
         int[] startRGB = hexToRGB(startColor);
         int[] endRGB = hexToRGB(endColor);
 
-        // Apply color to each character
         for (int i = 0; i < length; i++) {
-            double ratio = (double) i / (length - 1); // calculate ratio for interpolation
+            double ratio = (double) i / (length - 1);
             int red = (int) (startRGB[0] + ratio * (endRGB[0] - startRGB[0]));
             int green = (int) (startRGB[1] + ratio * (endRGB[1] - startRGB[1]));
             int blue = (int) (startRGB[2] + ratio * (endRGB[2] - startRGB[2]));
@@ -181,12 +165,11 @@ public class ShadowstrikeKatana extends JavaPlugin implements Listener {
         return gradientText.toString();
     }
 
-    // Function to convert a hex color string to an RGB array
     private int[] hexToRGB(String hex) {
         return new int[]{
-                Integer.valueOf(hex.substring(1, 3), 16), // Red
-                Integer.valueOf(hex.substring(3, 5), 16), // Green
-                Integer.valueOf(hex.substring(5, 7), 16)  // Blue
+                Integer.valueOf(hex.substring(1, 3), 16),
+                Integer.valueOf(hex.substring(3, 5), 16),
+                Integer.valueOf(hex.substring(5, 7), 16)
         };
     }
 }
