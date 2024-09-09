@@ -1,0 +1,16 @@
+name: shadowkatana
+version: '${project.version}'
+main: wcorrupt.itemname.ShadowstrikeKatana
+api-version: '1.21'
+
+commands:
+  getkatana:
+    description: Gives the player the Shadowstrike Katana.
+    usage: /getkatana
+    permission: shadowstrikekatana.get
+    permission-message: You don't have permission to use this command.
+
+permissions:
+  shadowstrikekatana.get:
+    description: Allows the player to get the Shadowstrike Katana.
+    default: op
